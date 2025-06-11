@@ -40,7 +40,7 @@ function App() {
       });
 
       if (!response.body) return;
-
+      console.log({ response });
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
 

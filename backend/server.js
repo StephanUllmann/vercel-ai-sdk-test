@@ -1,7 +1,7 @@
 import express from 'express';
 import chalk from 'chalk';
 import cors from 'cors';
-
+import { openai } from '@ai-sdk/openai';
 import { google } from '@ai-sdk/google';
 import { generateText, streamText } from 'ai';
 
@@ -27,6 +27,17 @@ app.post('/messages', async (req, res) => {
   res.json({ result });
 });
 
+app.post('/messages/openai', async (req, res) => {
+  const { prompt } = req.body;
+
+  const result = await generateText({
+    model: openai('gpt-3.5-turbo'),
+    prompt,
+  });
+
+  res.json({ result });
+});
+
 app.post('/messages/stream', async (req, res) => {
   const { prompt } = req.body;
 
@@ -42,6 +53,8 @@ app.post('/messages/stream', async (req, res) => {
       { role: 'user', content: prompt },
     ],
   });
+
+  // aiResponse.pipeTextStreamToResponse(res);
 
   res.writeHead(200, {
     Connection: 'keep-alive',
