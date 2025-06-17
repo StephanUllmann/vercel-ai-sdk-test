@@ -3,7 +3,9 @@ import chalk from 'chalk';
 import cors from 'cors';
 import { openai } from '@ai-sdk/openai';
 import { google } from '@ai-sdk/google';
-import { generateText, streamText } from 'ai';
+import { vertex } from '@ai-sdk/google-vertex';
+// import { createVertex } from '@ai-sdk/google-vertex';
+import { generateText, streamText, experimental_generateImage as generateImage } from 'ai';
 
 const port = process.env.PORT || 8080;
 
@@ -74,6 +76,17 @@ app.post('/messages/stream', async (req, res) => {
 
   res.end();
   res.on('close', () => res.end());
+});
+
+app.post('/images', async (req, res) => {
+  const { prompt } = req.body;
+
+  const { image } = await generateImage({
+    model: vertex.image('imagen-3.0-generate-002'),
+    prompt,
+    aspectRatio: '16:9',
+  });
+  res.json({ image });
 });
 
 app.use('/{*splat}', () => {

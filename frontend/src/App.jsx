@@ -40,7 +40,6 @@ function App() {
       });
 
       if (!response.body) return;
-      console.log({ response });
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
 
@@ -59,8 +58,8 @@ function App() {
         const lines = chunk.split('\n\n');
 
         for (const line of lines) {
-          if (line.startsWith('data:')) {
-            const data = line.substring(5); // Remove 'data:' prefix
+          if (line.startsWith('data: ')) {
+            const data = line.substring(6); // Remove 'data: ' prefix
             try {
               // As per our previous discussion, parse the JSON
               const parsedText = JSON.parse(data).replaceAll('\n', '  \n');
