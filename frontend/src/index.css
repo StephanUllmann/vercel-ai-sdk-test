@@ -1,3 +1,19 @@
+@import 'tailwindcss';
+@plugin "daisyui";
+
+@utility animate-fade-in {
+  animation: fade-in 100ms linear forwards;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;

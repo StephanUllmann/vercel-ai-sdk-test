@@ -24,14 +24,43 @@ const renderer = {
 
 function App() {
   const [prompt, setPrompt] = useState('');
-
   const [aiResponse, setAiResponse] = useState('');
+  const [pending, setPending] = useState(false);
+  const [isImageGen, setIsImageGen] = useState(false);
+  const [base64img, setBase64img] = useState(null);
+
+  const handleImageGen = async () => {
+    try {
+      setAiResponse('');
+      setBase64img('');
+      const response = await fetch('http://localhost:8080/images', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ prompt }),
+      });
+
+      const { image } = await response.json();
+      const b64 = image.data[0].b64_json;
+      setBase64img(b64);
+    } catch (error) {
+      console.error('Error in image genearation: ', error);
+    } finally {
+      setPending(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isImageGen) {
+      handleImageGen();
+      return;
+    }
     try {
+      setPending(true);
       setAiResponse('');
-      const response = await fetch('http://localhost:8080/messages/stream', {
+      const response = await fetch('http://localhost:8080/chat/stream', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -76,19 +105,59 @@ function App() {
       }
     } catch (error) {
       console.error('Error starting stream:', error);
+    } finally {
+      setPending(false);
     }
   };
 
+  const reset = () => {
+    setAiResponse('');
+    setPrompt('');
+  };
+
   return (
-    <>
-      <form onSubmit={handleSubmit}>
-        <textarea value={prompt} onChange={(e) => setPrompt(e.target.value)}></textarea>
-        <button>Ask</button>
+    <main className='outline outline-red-500 h-screen p-2 mx-auto w-5xl flex flex-col items-center'>
+      <form onSubmit={handleSubmit} className='flex w-full gap-2 items-end'>
+        <textarea
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
+          placeholder={isImageGen ? 'Prompt your image...' : 'State your question...'}
+          className='textarea textarea-primary flex-10/12 h-40 resize-none'
+        ></textarea>
+        <div className='flex-2/12 flex flex-col gap-2'>
+          <label className='label'>
+            <input
+              type='checkbox'
+              checked={isImageGen}
+              onChange={() => setIsImageGen((p) => !p)}
+              className='checkbox'
+            />
+            Image Generation
+          </label>
+          <button className='btn btn-primary ' disabled={pending}>
+            {pending ? <span className='loading loading-spinner'></span> : <span>Send</span>}
+          </button>
+          <button className='btn btn-secondary' type='reset' onClick={reset}>
+            Clear
+          </button>
+        </div>
       </form>
-      <div style={{ textAlign: 'start' }}>
+      <div className='mockup-window border border-base-300 w-full my-4 flex-1 overflow-y-auto text-start px-4 '>
+        {isImageGen && !base64img && <div className='skeleton mask mask-squircle w-72 aspect-square'></div>}
+        {base64img && (
+          <div className='mask mask-squircle w-72'>
+            <a href={`data:image/png;base64,${base64img}`} download={Date.now() + '.png'} title='Download'>
+              <img
+                className='hover:scale-101 transition-transform'
+                src={`data:image/png;base64,${base64img}`}
+                alt={'AI generated image based on prompt: ' + prompt}
+              />
+            </a>
+          </div>
+        )}
         <Markdown value={aiResponse} renderer={renderer} />
       </div>
-    </>
+    </main>
   );
 }
 
