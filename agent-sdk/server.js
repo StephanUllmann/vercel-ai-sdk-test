@@ -59,8 +59,7 @@ app.post('/chat/stream', async (req, res) => {
 
   // Send back answer chunks
   for await (const event of result) {
-    if (event.type === 'raw_model_stream_event') {
-      if (!event.data.delta) continue;
+    if (event.data?.delta && event.type === 'raw_model_stream_event') {
       const jsonString = JSON.stringify(event.data.delta);
       res.write(`data: ${jsonString}\n\n`);
     }
