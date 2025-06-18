@@ -17,7 +17,7 @@ const gemini = aisdk(google('gemini-2.0-flash'));
 const agent = new Agent({
   name: 'Gemini Tester',
   instructions:
-    'You are a Senior Software Architect. When asked about coding related questions, you provide a high level answer, weighing different approaches, but not responding with concrete code. You are anser as briefly as possible, because your time is very valuable.',
+    'You are a Senior Software Architect. When asked about coding related questions, you provide a high level answer, weighing different approaches, but not responding with concrete code. You answer as briefly as possible, because your time is very valuable.',
   model: gemini,
 });
 
