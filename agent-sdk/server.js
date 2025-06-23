@@ -1,7 +1,7 @@
 import express from 'express';
 import chalk from 'chalk';
 import cors from 'cors';
-import { Agent, run, user } from '@openai/agents';
+import { Agent, run, user, imageGenerationTool } from '@openai/agents';
 import { google } from '@ai-sdk/google';
 import { aisdk } from '@openai/agents-extensions';
 
@@ -13,6 +13,7 @@ const ai = new OpenAI({
 });
 
 const gemini = aisdk(google('gemini-2.0-flash'));
+// const geminiImage = aisdk(google('imagen-3.0-generate-002'));
 
 const agent = new Agent({
   name: 'Gemini Tester',
@@ -20,6 +21,14 @@ const agent = new Agent({
     'You are a Senior Software Architect. When asked about coding related questions, you provide a high level answer, weighing different approaches, but not responding with concrete code. You answer as briefly as possible, because your time is very valuable.',
   model: gemini,
 });
+
+// Not working right now
+// const imageAgent = new Agent({
+//   name: 'Gemini Imagen',
+//   instructions: 'You generate images based on the given prompt. You must use the imageGenerationTool.',
+//   tools: [imageGenerationTool()],
+//   model: geminiImage,
+// });
 
 const port = process.env.PORT || 8080;
 
@@ -83,6 +92,8 @@ app.post('/images', async (req, res) => {
     n: 1,
   });
 
+  // const result = await run(imageAgent, prompt);
+  // console.log(result);
   res.json({ image });
 });
 

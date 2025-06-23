@@ -142,7 +142,7 @@ function App() {
           </button>
         </div>
       </form>
-      <div className='mockup-window border border-base-300 w-full my-4 flex-1 overflow-y-auto text-start px-4 '>
+      <div className='mockup-window border  w-full my-4 flex-1 overflow-y-auto text-start px-4 '>
         {isImageGen && !base64img && <div className='skeleton mask mask-squircle w-72 aspect-square'></div>}
         {base64img && (
           <div className='mask mask-squircle w-72'>
